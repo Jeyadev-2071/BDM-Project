@@ -34,10 +34,11 @@ jobs:
       env:
         GCP_REGION: "asia-south1"  # Replace with your GCP bucket region
 
-    # Step 5: Upload dbt project to GCS
+    # Step 5: Upload dbt project to GCS # gsutil -m cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
     - name: Copy dbt Project to GCS
       run: |
-        gsutil -m cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
+        
+        gcloud storage cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
       env:
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
 
