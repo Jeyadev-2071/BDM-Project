@@ -81,5 +81,5 @@ with DAG(
     )
 
     # Task dependencies
-    write_service_account_key >> debug_env >> debug_before_copy >> fetch_profiles >> debug_after_copy
+    write_service_account_key >> debug_env >> debug_before_copy >> fetch_profiles >> debug_after_copy >> dbt_run >> dbt_test
     #write_service_account_key >> fetch_profiles >> dbt_run >> dbt_test
