@@ -18,7 +18,7 @@ jobs:
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-
+      
     - name: Write service account key to JSON file
       run: |
         echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > /tmp/service_account_key.json
@@ -26,7 +26,7 @@ jobs:
     # Step 3: Upload dbt project to GCS
     - name: Copy dbt Project to GCS
       run: |
-        gsutil -m cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
+        gsutil cp ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
     
 
     # Step 4: Set up dbt environment (optional, for testing locally)
