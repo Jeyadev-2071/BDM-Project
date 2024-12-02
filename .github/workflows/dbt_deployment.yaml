@@ -51,14 +51,13 @@ jobs:
         dbt --version
       env:
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
-
     # Step 7: Run dbt commands (optional, for running dbt commands on push)
     - name: Run dbt commands
       run: |
         source venv/bin/activate
-        dbt debug --profiles-dir ./profiles
-        dbt run --profiles-dir ./profiles
-        dbt test --profiles-dir ./profiles
+        dbt debug --profiles-dir .dbt/
+        dbt run --profiles-dir .dbt/
+        dbt test --profiles-dir .dbt/
       env:
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
 
