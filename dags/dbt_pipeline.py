@@ -61,24 +61,24 @@ with DAG(
     bash_command='ls -R /home/airflow/gcs/data/.dbt'
     )
     # # Task 2: Run dbt commands (e.g., dbt run)
-    # dbt_run = BashOperator(
-    #     task_id='dbt_run',
-    #     bash_command='dbt run --profiles-dir /home/airflow/gcs/data/.dbt/',
-    #     env={
-    #         'PATH': '/opt/python3.11/bin:$PATH',
-    #         'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
-    #     }
-    # )
+    dbt_run = BashOperator(
+        task_id='dbt_run',
+        bash_command='dbt run --profiles-dir /home/airflow/gcs/data/.dbt/',
+        env={
+            'PATH': '/opt/python3.11/bin:$PATH',
+            'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
+        }
+    )
 
     # # Task 3: Run dbt test
-    # dbt_test = BashOperator(
-    #     task_id='dbt_test',
-    #     bash_command='dbt test --profiles-dir /home/airflow/gcs/data/.dbt/',
-    #     env={
-    #         'PATH': '/opt/python3.11/bin:$PATH',
-    #         'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
-    #     }
-    # )
+    dbt_test = BashOperator(
+        task_id='dbt_test',
+        bash_command='dbt test --profiles-dir /home/airflow/gcs/data/.dbt/',
+        env={
+            'PATH': '/opt/python3.11/bin:$PATH',
+            'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
+        }
+    )
 
     # Task dependencies
     write_service_account_key >> debug_env >> debug_before_copy >> fetch_profiles >> debug_after_copy
