@@ -32,10 +32,10 @@ with DAG(
         """,
         env={'SERVICE_ACCOUNT_KEY': '{{ var.value.service_account_key }}'}
     )
-    # debug_env = BashOperator(
-    # task_id='debug_env',
-    # bash_command='echo $PATH && which dbt'
-    # )
+    debug_env = BashOperator(
+    task_id='debug_env',
+    bash_command='ls -R /path/to/your/dbt/project && ls /home/airflow/gcs/data/.dbt/'
+    )
 
     fetch_profiles = BashOperator(
     task_id='fetch_profiles',
@@ -73,4 +73,5 @@ with DAG(
     )
 
     # Task dependencies
-    write_service_account_key >> fetch_profiles >> dbt_run >> dbt_test
+    write_service_account_key >> debug_env
+    #write_service_account_key >> fetch_profiles >> dbt_run >> dbt_test
