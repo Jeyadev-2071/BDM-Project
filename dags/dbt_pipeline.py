@@ -32,44 +32,45 @@ with DAG(
         """,
         env={'SERVICE_ACCOUNT_KEY': '{{ var.value.service_account_key }}'}
     )
-    debug_env = BashOperator(
-    task_id='debug_env',
-    bash_command='echo $PATH && which dbt'
+    # debug_env = BashOperator(
+    # task_id='debug_env',
+    # bash_command='echo $PATH && which dbt'
+    # )
+
+    fetch_profiles = BashOperator(
+    task_id='fetch_profiles',
+    bash_command="""
+    set -e  # Exit on error
+    echo "Creating directory for profiles.yml..."
+    mkdir -p /home/airflow/gcs/data/.dbt
+    echo "Copying profiles.yml from GCS to /home/airflow/gcs/data/.dbt/..."
+    gcloud storage cp gs://bdm-project-bucket/dbt/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml
+    echo "profiles.yml successfully copied"
+    """,
+    env={
+        'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
+        }
+    )   
+
+    # Task 2: Run dbt commands (e.g., dbt run)
+    dbt_run = BashOperator(
+        task_id='dbt_run',
+        bash_command='dbt run --profiles-dir /home/airflow/gcs/data/.dbt/',
+        env={
+            'PATH': '/opt/python3.11/bin:$PATH',
+            'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
+        }
     )
 
-    # fetch_profiles = BashOperator(
-    # task_id='fetch_profiles',
-    # bash_command="""
-    # set -e  # Exit on error
-    # echo "Creating directory for profiles.yml..."
-    # mkdir -p /home/airflow/gcs/data/.dbt
-    # echo "Copying profiles.yml from GCS to /home/airflow/gcs/data/.dbt/..."
-    # gcloud storage cp gs://bdm-project-bucket/dbt/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml
-    # echo "profiles.yml successfully copied"
-    # """,
-    # env={
-    #     'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
-    #     }
-    # )   
+    # Task 3: Run dbt test
+    dbt_test = BashOperator(
+        task_id='dbt_test',
+        bash_command='dbt test --profiles-dir /home/airflow/gcs/data/.dbt/',
+        env={
+            'PATH': '/opt/python3.11/bin:$PATH',
+            'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
+        }
+    )
 
-    # # Task 2: Run dbt commands (e.g., dbt run)
-    # dbt_run = BashOperator(
-    #     task_id='dbt_run',
-    #     bash_command='dbt run --profiles-dir /home/airflow/gcs/data/.dbt/',
-    #     env={
-    #         'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
-    #     }
-    # )
-
-    # # Task 3: Run dbt test
-    # dbt_test = BashOperator(
-    #     task_id='dbt_test',
-    #     bash_command='dbt test --profiles-dir /home/airflow/gcs/data/.dbt/',
-    #     env={
-    #         'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
-    #     }
-    # )
-
-    # # Task dependencies
-    # write_service_account_key >> fetch_profiles >> dbt_run >> dbt_test
-    write_service_account_key >> debug_env
+    # Task dependencies
+    write_service_account_key >> fetch_profiles >> dbt_run >> dbt_test
