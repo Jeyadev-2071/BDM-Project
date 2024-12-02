@@ -37,7 +37,6 @@ jobs:
     # Step 5: Upload dbt project to GCS # gsutil -m cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
     - name: Copy dbt Project to GCS
       run: |
-        
         gcloud storage cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
       env:
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
@@ -45,6 +44,7 @@ jobs:
     # Step 6: Set up dbt environment (optional, for testing locally)
     - name: Set up dbt environment
       run: |
+        echo $GOOGLE_APPLICATION_CREDENTIALS
         python -m venv venv
         source venv/bin/activate
         pip install dbt-bigquery
