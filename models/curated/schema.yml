@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: trn_booking_metrics
+    description: "Intermediate transformation layer aggregating booking metrics by hotel and date."
+    columns:
+      - name: hotel
+        description: "The name of the hotel."
+        data_tests:
+          - not_null
+
+      - name: arrival_date_year
+        description: "Year of arrival for bookings."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: [2015, 2016, 2017]  # Update as per the dataset
+
+      - name: arrival_date_month
+        description: "Month of arrival for bookings."
+        data_tests:
+          - not_null
+
+      # - name: total_bookings
+      #   description: "Total number of bookings for the hotel."
+      #   data_tests:
+      #     - not_null
+      #     - greater_than: { value: 0 }
+
+      # - name: revenue
+      #   description: "Total revenue for the hotel."
+      #   data_tests:
+      #     - not_null
+      #     - greater_than: { value: 0 }
+
+      # - name: avg_lead_time
+      #   description: "Average lead time for bookings."
+      #   data_tests:
+      #     - not_null
+      #     - greater_than: { value: 0 }

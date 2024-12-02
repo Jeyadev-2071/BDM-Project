@@ -1,0 +1,37 @@
+# Name of the DBT project
+name: BDM_PROJECT
+profile: BDM_PROJECT
+version: 1.0.0
+
+# Directories to be cleaned by `dbt clean`
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+models:
+  BDM_PROJECT:  # Namespace for your project's models
+    # The target environment to use
+    target: dev
+    staging:     # Subfolder for staging models
+      +materialized: view  # Default materialization for staging models
+    transformed: # Subfolder for transformed models
+      +materialized: table  # Default materialization for transformed models
+    curated:     # Subfolder for curated models
+      +materialized: table  # Default materialization for curated models
+# Outputs section for database connections
+    outputs:
+      dev:
+        type: bigquery                     # Using BigQuery as the data warehouse
+        method: service-account            # Authentication method
+        project: iitj-capstone-project-group-18  # GCP project ID
+        dataset: BDM_PROJECT               # Default dataset for models
+        keyfile: "iitj-capstone-project-group-18-9b663b95bfee.json"  # Path to service account key
+        location: EU                       # Location of the BigQuery instance
+        priority: interactive              # Query priority (interactive/batch)
+        threads: 2                         # Number of concurrent threads for model execution
+        job_execution_timeout_seconds: 120 # Max execution time for a job
+        job_retries: 1                     # Number of retries for failed jobs
+
+

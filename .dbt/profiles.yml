@@ -1,0 +1,14 @@
+BDM_PROJECT:
+  outputs:
+    dev:
+      dataset: BDM_PROJECT
+      job_execution_timeout_seconds: 120
+      job_retries: 1
+      keyfile: '.dbt/iitj-capstone-project-group-18-9b663b95bfee.json'
+      location: asia-south1
+      method: service-account
+      priority: interactive
+      project: iitj-capstone-project-group-18
+      threads: 2
+      type: bigquery
+  target: dev

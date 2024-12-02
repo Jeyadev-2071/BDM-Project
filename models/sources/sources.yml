@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: BDM_PROJECT
+    schema: BDM_PROJECT  # BigQuery dataset name
+    tables:
+      - name: CURATED_HOTEL_DATA  # BigQuery table name
+        description: "Cleaned and curated hotel booking data."
