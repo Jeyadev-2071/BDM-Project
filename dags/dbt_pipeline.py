@@ -34,7 +34,7 @@ with DAG(
     )
     debug_env = BashOperator(
     task_id='debug_env',
-    bash_command='ls -R ls /home/airflow/gcs/data/.dbt/'
+    bash_command='ls -R /home/airflow/gcs/data/.dbt/'
     )
 
     fetch_profiles = BashOperator(
