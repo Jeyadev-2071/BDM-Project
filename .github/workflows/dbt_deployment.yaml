@@ -40,3 +40,7 @@ jobs:
         gcloud storage cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
       env:
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
+    
+    - name: Upload DAG to Composer
+      run: |
+        gcloud storage cp ./dags/dbt_pipeline.py gs://asia-south1-bdm-project-sch-34306c64-bucket/dags

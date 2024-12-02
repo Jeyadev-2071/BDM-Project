@@ -25,7 +25,7 @@ with DAG(
     fetch_profiles = BashOperator(
         task_id='fetch_profiles',
         bash_command='mkdir -p /home/airflow/gcs/data/.dbt && '
-                     'gcloud cp gs://bdm-project-bucket/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml'
+                     'gcloud storage cp gs://bdm-project-bucket/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml'
     )
 
     # Task 2: Run dbt commands (e.g., dbt run)
