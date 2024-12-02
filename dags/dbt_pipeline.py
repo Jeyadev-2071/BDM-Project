@@ -22,10 +22,7 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    # Set the JSON content in an environment variable
-    #service_account_key = os.getenv("service_account_key")
-
-    # Task 1: Write the JSON content to a temporary file
+    
     # Task 1: Write the JSON content from the environment variable to a temporary file
     write_service_account_key = BashOperator(
         task_id='write_service_account_key',
@@ -42,7 +39,7 @@ with DAG(
     echo "Creating directory for profiles.yml..."
     mkdir -p /home/airflow/gcs/data/.dbt
     echo "Copying profiles.yml from GCS to /home/airflow/gcs/data/.dbt/..."
-    gsutil cp gs://bdm-project-bucket/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml
+    gcloud storage cp gs://bdm-project-bucket/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml
     if [ $? -ne 0 ]; then
         echo "Error: Failed to copy profiles.yml from GCS"
         exit 1
