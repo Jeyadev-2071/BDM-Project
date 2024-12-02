@@ -1,11 +1,13 @@
 BDM_PROJECT:
   outputs:
     dev:
+      type: bigquery
+      method: oath
       dataset: BDM_PROJECT
       job_execution_timeout_seconds: 120
       job_retries: 1
       location: asia-south1
-      method: service-account
+      # method: service-account
       priority: interactive
       project: iitj-capstone-project-group-18
       threads: 2

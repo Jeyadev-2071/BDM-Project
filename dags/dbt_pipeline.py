@@ -21,17 +21,25 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    # Task 1: Run dbt run
+    # Task 1: Fetch profiles.yml from GCS (if using Cloud Composer or GCS storage)
+    fetch_profiles = BashOperator(
+        task_id='fetch_profiles',
+        bash_command='mkdir -p /home/airflow/gcs/data/.dbt && '
+                     'gcloud cp gs://bdm-project-bucket/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml'
+    )
+
+    # Task 2: Run dbt commands (e.g., dbt run)
     dbt_run = BashOperator(
         task_id='dbt_run',
-        bash_command='dbt run --profiles-dir bdm-project-bucket/.dbt/',
+        bash_command='dbt run --profiles-dir /home/airflow/gcs/data/.dbt/',
+        
     )
 
-    # Task 2: Run dbt test
+    # Task 3: Run dbt test
     dbt_test = BashOperator(
         task_id='dbt_test',
-        bash_command='dbt test --profiles-dir bdm-project-bucket/.dbt/',
+        bash_command='dbt test --profiles-dir /home/airflow/gcs/data/.dbt/',
     )
 
-    # Set task dependencies
-    dbt_run >> dbt_test
+    # Task Dependencies
+    fetch_profiles >> dbt_run >> dbt_test
