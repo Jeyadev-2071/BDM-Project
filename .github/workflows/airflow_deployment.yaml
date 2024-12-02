@@ -19,7 +19,12 @@ jobs:
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-
+    - name: List Files in Working Directory
+      run: |
+        echo "Current working directory:"
+        pwd
+        echo "Files and directories:"
+        ls -R  # Lists files recursively
     - name: Upload DAG to Composer
       run: |
         gcloud storage cp ./dags/dbt_pipeline_dag.py gs://asia-south1-bdm-project-sch-34306c64-bucket/dags
