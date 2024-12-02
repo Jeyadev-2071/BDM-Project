@@ -27,12 +27,12 @@ jobs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
 
-    # Step 4: Verify GCS bucket existence
-    - name: Verify GCS Bucket
-      run: |
-        gsutil ls gs://${{ secrets.GCP_BUCKET_NAME }} || gsutil mb -l ${GCP_REGION} gs://${{ secrets.GCP_BUCKET_NAME }}
-      env:
-        GCP_REGION: "asia-south1"  # Replace with your GCP bucket region
+    # # Step 4: Verify GCS bucket existence
+    # - name: Verify GCS Bucket
+    #   run: |
+    #     gsutil ls gs://${{ secrets.GCP_BUCKET_NAME }} || gsutil mb -l ${GCP_REGION} gs://${{ secrets.GCP_BUCKET_NAME }}
+    #   env:
+    #     GCP_REGION: "asia-south1"  # Replace with your GCP bucket region
 
     # Step 5: Upload dbt project to GCS # gsutil -m cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
     - name: Copy dbt Project to GCS
