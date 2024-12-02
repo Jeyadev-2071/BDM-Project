@@ -23,15 +23,15 @@ with DAG(
 ) as dag:
 
     
-    # Task 1: Write the JSON content from the environment variable to a temporary file
-    write_service_account_key = BashOperator(
-        task_id='write_service_account_key',
-        bash_command="""
-        mkdir -p temp &&
-        echo "$SERVICE_ACCOUNT_KEY" > temp/google_key.json
-        """,
-        env={'SERVICE_ACCOUNT_KEY': '{{ var.value.service_account_key }}'}
-    )
+    # # Task 1: Write the JSON content from the environment variable to a temporary file
+    # write_service_account_key = BashOperator(
+    #     task_id='write_service_account_key',
+    #     bash_command="""
+    #     mkdir -p temp &&
+    #     echo "$SERVICE_ACCOUNT_KEY" > temp/google_key.json
+    #     """,
+    #     env={'SERVICE_ACCOUNT_KEY': '{{ var.value.service_account_key }}'}
+    # )
     debug_env = BashOperator(
     task_id='debug_env',
     bash_command='ls -ld /home/airflow/gcs/data/.dbt'
@@ -47,7 +47,7 @@ with DAG(
     bash_command="""
     set -e  # Exit on error
     echo "Creating directory for profiles.yml..."
-    mkdir -p /home/airflow/gcs/data/.dbt
+    mkdir -p /home/airflow/gcs/data/dbt_source
     echo "Copying profiles.yml from GCS to /home/airflow/gcs/data/.dbt/..."
     gcloud storage cp -r gs://bdm-project-bucket/dbt /home/airflow/gcs/data/dbt_source
     echo "profiles.yml successfully copied"
