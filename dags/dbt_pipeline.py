@@ -24,13 +24,13 @@ with DAG(
     # Task 1: Run dbt run
     dbt_run = BashOperator(
         task_id='dbt_run',
-        bash_command='dbt run --profiles-dir /path/to/profiles --project-dir /path/to/dbt_project',
+        bash_command='dbt run --profiles-dir bdm-project-bucket/.dbt/',
     )
 
     # Task 2: Run dbt test
     dbt_test = BashOperator(
         task_id='dbt_test',
-        bash_command='dbt test --profiles-dir /path/to/profiles --project-dir /path/to/dbt_project',
+        bash_command='dbt test --profiles-dir bdm-project-bucket/.dbt/',
     )
 
     # Set task dependencies
