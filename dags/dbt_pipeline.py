@@ -39,7 +39,7 @@ with DAG(
     echo "Creating directory for profiles.yml..."
     mkdir -p /home/airflow/gcs/data/.dbt
     echo "Copying profiles.yml from GCS to /home/airflow/gcs/data/.dbt/..."
-    gcloud storage cp gs://bdm-project-bucket/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml
+    gcloud storage cp gs://bdm-project-bucket/dbt/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml
     echo "profiles.yml successfully copied"
     """,
     env={
