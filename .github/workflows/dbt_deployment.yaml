@@ -3,55 +3,73 @@ name: Deploy dbt to GCP
 on:
   push:
     branches:
-      - master 
+      - master
 
 jobs:
   deploy-dbt:
     runs-on: ubuntu-latest
+
     steps:
     # Step 1: Checkout the code
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # Step 2: Set up Google Cloud SDK
+    # Step 2: Authenticate with Google Cloud
     - name: Authenticate with Google Cloud
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-      
-    - name: Write service account key to JSON file
+
+    # Step 3: Set GOOGLE_APPLICATION_CREDENTIALS environment variable
+    - name: Set Environment Variable for Authentication
       run: |
         echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > /tmp/service_account_key.json
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
 
-    # Step 3: Upload dbt project to GCS
+    # Step 4: Verify GCS bucket existence
+    - name: Verify GCS Bucket
+      run: |
+        gsutil ls gs://${{ secrets.GCP_BUCKET_NAME }} || gsutil mb -l ${GCP_REGION} gs://${{ secrets.GCP_BUCKET_NAME }}
+      env:
+        GCP_REGION: "asia-south1"  # Replace with your GCP bucket region
+
+    # Step 5: Upload dbt project to GCS
     - name: Copy dbt Project to GCS
       run: |
-        gsutil cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt/
-    
+        gsutil -m cp -r ./ gs://${{ secrets.GCP_BUCKET_NAME }}/dbt
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
 
-    # Step 4: Set up dbt environment (optional, for testing locally)
+    # Step 6: Set up dbt environment (optional, for testing locally)
     - name: Set up dbt environment
       run: |
         python -m venv venv
         source venv/bin/activate
         pip install dbt-bigquery
         dbt --version
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
 
-    # Step 5: Run dbt commands (optional, for running dbt commands on push)
+    # Step 7: Run dbt commands (optional, for running dbt commands on push)
     - name: Run dbt commands
       run: |
         source venv/bin/activate
         dbt debug --profiles-dir ./profiles
         dbt run --profiles-dir ./profiles
         dbt test --profiles-dir ./profiles
-    env:
-      GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
-    # Step 6: Trigger Airflow DAG (optional, for triggering Airflow directly)
-    # - name: Trigger Airflow DAG
-    #   run: |
-    #     curl -X POST "https://composer.googleapis.com/v1/projects/$GCP_PROJECT_ID/locations/$GCP_REGION/environments/$COMPOSER_ENVIRONMENT_NAME:triggerDag" \
-    #     -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-    #     -H "Content-Type: application/json" \
-    #     -d '{
-    #           "dag_name": "dbt_pipeline"
-    #         }'
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
+
+    # Step 8: Trigger Airflow DAG (optional)
+    - name: Trigger Airflow DAG
+      if: ${{ secrets.AIRFLOW_DAG_TRIGGER_ENABLED == 'true' }}  # Optional conditional execution
+      run: |
+        curl -X POST "https://composer.googleapis.com/v1/projects/${{ secrets.GCP_PROJECT_ID }}/locations/${{ secrets.GCP_REGION }}/environments/${{ secrets.COMPOSER_ENVIRONMENT_NAME }}:triggerDag" \
+        -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+        -H "Content-Type: application/json" \
+        -d '{
+              "dag_name": "dbt_pipeline"
+            }'
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
