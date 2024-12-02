@@ -71,5 +71,5 @@ jobs:
     #     -d '{
     #           "dag_name": "dbt_pipeline"
     #         }'
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
+      # env:
+      #   GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
