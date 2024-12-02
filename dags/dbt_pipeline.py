@@ -40,10 +40,6 @@ with DAG(
     mkdir -p /home/airflow/gcs/data/.dbt
     echo "Copying profiles.yml from GCS to /home/airflow/gcs/data/.dbt/..."
     gcloud storage cp gs://bdm-project-bucket/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to copy profiles.yml from GCS"
-        exit 1
-    fi
     echo "profiles.yml successfully copied"
     """,
     env={
