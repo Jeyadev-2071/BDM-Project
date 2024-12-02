@@ -49,7 +49,7 @@ with DAG(
     echo "Creating directory for profiles.yml..."
     mkdir -p /home/airflow/gcs/data/.dbt
     echo "Copying profiles.yml from GCS to /home/airflow/gcs/data/.dbt/..."
-    gcloud storage cp gs://bdm-project-bucket/dbt/.dbt/profiles.yml /home/airflow/gcs/data/.dbt/profiles.yml
+    gcloud storage cp -r gs://bdm-project-bucket/dbt /home/airflow/gcs/data/dbt_source
     echo "profiles.yml successfully copied"
     """,
     env={
@@ -63,7 +63,7 @@ with DAG(
     # # Task 2: Run dbt commands (e.g., dbt run)
     dbt_run = BashOperator(
         task_id='dbt_run',
-        bash_command='dbt run --profiles-dir /home/airflow/gcs/data/.dbt/',
+        bash_command='dbt run --profiles-dir /home/airflow/gcs/data/dbt_source/.dbt',
         env={
             'PATH': '/opt/python3.11/bin:$PATH',
             'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'
@@ -73,7 +73,7 @@ with DAG(
     # # Task 3: Run dbt test
     dbt_test = BashOperator(
         task_id='dbt_test',
-        bash_command='dbt test --profiles-dir /home/airflow/gcs/data/.dbt/',
+        bash_command='dbt test --profiles-dir /home/airflow/gcs/data/dbt_source/.dbt',
         env={
             'PATH': '/opt/python3.11/bin:$PATH',
             'GOOGLE_APPLICATION_CREDENTIALS': 'temp/google_key.json'

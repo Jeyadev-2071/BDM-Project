@@ -3,7 +3,7 @@ BDM_PROJECT:
     dev:
       type: bigquery
       #method: oath
-      keyfile: "temp/google_key.json"
+      keyfile: ".dbt/cred.json"
       dataset: BDM_PROJECT
       job_execution_timeout_seconds: 120
       job_retries: 1
