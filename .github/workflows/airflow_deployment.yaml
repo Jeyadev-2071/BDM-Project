@@ -2,7 +2,7 @@ name: Deploy DAG to Airflow
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - "dags/**"
 

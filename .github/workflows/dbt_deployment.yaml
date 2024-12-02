@@ -3,7 +3,7 @@ name: Deploy dbt to GCP
 on:
   push:
     branches:
-      - main  # Adjust this to your deployment branch
+      - master 
 
 jobs:
   deploy-dbt:
