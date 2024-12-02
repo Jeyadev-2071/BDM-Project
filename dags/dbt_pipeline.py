@@ -23,16 +23,17 @@ with DAG(
 ) as dag:
 
     # Set the JSON content in an environment variable
-    service_account_key = os.getenv("service_account_key")
+    #service_account_key = os.getenv("service_account_key")
 
     # Task 1: Write the JSON content to a temporary file
+    # Task 1: Write the JSON content from the environment variable to a temporary file
     write_service_account_key = BashOperator(
         task_id='write_service_account_key',
         bash_command="""
         mkdir -p temp &&
-        echo '{{ service_account_key }}' > temp/google_key.json
+        echo "$SERVICE_ACCOUNT_KEY" > temp/google_key.json
         """,
-        env={'service_account_key': service_account_key}
+        env={'SERVICE_ACCOUNT_KEY': '{{ var.value.SERVICE_ACCOUNT_KEY }}'}
     )
     fetch_profiles = BashOperator(
     task_id='fetch_profiles',
