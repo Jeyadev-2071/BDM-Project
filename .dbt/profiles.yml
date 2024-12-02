@@ -2,7 +2,6 @@ BDM_PROJECT:
   outputs:
     dev:
       dataset: BDM_PROJECT
-      keyfile: 
       job_execution_timeout_seconds: 120
       job_retries: 1
       location: asia-south1
