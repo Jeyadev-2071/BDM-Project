@@ -33,7 +33,7 @@ with DAG(
         mkdir -p temp &&
         echo "$SERVICE_ACCOUNT_KEY" > temp/google_key.json
         """,
-        env={'SERVICE_ACCOUNT_KEY': '{{ var.value.SERVICE_ACCOUNT_KEY }}'}
+        env={'SERVICE_ACCOUNT_KEY': '{{ var.value.service_account_key }}'}
     )
     fetch_profiles = BashOperator(
     task_id='fetch_profiles',
