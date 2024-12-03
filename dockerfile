@@ -25,6 +25,7 @@ COPY . .
 RUN chmod 600 /app/.dbt/cred.json
 ENV DBT_PROFILES_DIR=/app/.dbt
 # Set the entry point to run dbt commands
+
 CMD sh -c "if [ -f /app/.dbt/cred.json ]; then \
   echo 'Cred file is present in /app/.dbt'; \
   else echo 'Error: cred.json not found in /app/.dbt'; \
