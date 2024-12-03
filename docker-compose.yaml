@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  dbt:
+    build:
+      context: .  # Use the current directory to build the Docker image
+      dockerfile: Dockerfile
+    container_name: dbt_bigquery
+    volumes:
+      - .:/app                  # Mount the entire project directory
+      - ./dbt_packages:/app/dbt_packages  # Mount dbt packages
+      - ./logs:/app/logs        # Mount logs for dbt output
+      - ./.dbt:/root/.dbt       # Mount the `.dbt` folder containing profiles.yml
+    environment:
+      DBT_PROFILES_DIR: /root/.dbt  # Point dbt to the profiles.yml location
+    stdin_open: true
+    tty: true
+    command: tail -f /dev/null  # Keeps the container running
