@@ -26,6 +26,7 @@ jobs:
     - id: 'get-credentials'
       uses: 'google-github-actions/get-gke-credentials@v2'
       with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
         cluster_name: 'bdm-project'
         location: 'asia-south1'
 
