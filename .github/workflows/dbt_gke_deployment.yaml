@@ -18,7 +18,9 @@ jobs:
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
       with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+        export_default_credentials: true
 
     # Step 3: Authenticate with GKE
     - name: Authenticate to GKE
