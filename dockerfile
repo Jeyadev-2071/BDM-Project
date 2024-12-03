@@ -18,6 +18,6 @@ RUN echo "$GCP_SERVICE_ACCOUNT_KEY" > /app/.dbt/cred.json
 
 # Set permissions for the cred.json file
 RUN chmod 600 /app/.dbt/cred.json
-
+ENV DBT_PROFILES_DIR=/app/.dbt
 # Set the entry point to run dbt commands
 CMD ["sh", "-c", "dbt docs generate && dbt docs serve --host 0.0.0.0 --port 8080"]
