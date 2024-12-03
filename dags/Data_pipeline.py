@@ -51,7 +51,6 @@ dbt_run = KubernetesPodOperator(
     get_logs=True,
     dag=dag,
 )
-
 dbt_test = KubernetesPodOperator(
     task_id="dbt_test",
     name="dbt-test-task",
