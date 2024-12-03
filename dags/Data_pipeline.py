@@ -10,7 +10,6 @@ default_args = {
     "email_on_retry": False,
     "retries": 1,
 }
-
 dag = DAG(
     "kubernetes_dbt_workflow",
     default_args=default_args,
@@ -19,16 +18,13 @@ dag = DAG(
     start_date=datetime(2023, 1, 1),
     catchup=False,
 )
-
 # Configurations
 GKE_NAMESPACE = "default"  # Change if your pods are in a different namespace
 GKE_CLUSTER_NAME = "bdm-project"
 GKE_REGION = "asia-south1"  # e.g., asia-south1
 PROJECT_ID = "iitj-capstone-project-group-18"
-
-DBT_IMAGE = "gcr.io/iitj-capstone-project-group-18/dbt_image:latest"  # Docker image with dbt installed
-PYTHON_SCRIPT_IMAGE = "gcr.io/iitj-capstone-project-group-18/dbt_image:latest"  # Docker image with the Python script
-
+DBT_IMAGE = "gcr.io/iitj-capstone-project-group-18/dbt_image:latest" 
+PYTHON_SCRIPT_IMAGE = "gcr.io/iitj-capstone-project-group-18/dbt_image:latest"  
 
 # Task 1: Run the Python script
 run_python_script = KubernetesPodOperator(
