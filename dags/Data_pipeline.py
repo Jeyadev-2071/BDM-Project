@@ -1,5 +1,6 @@
 from datetime import datetime
 from airflow import DAG
+from airflow.providers.google.cloud.operators.kubernetes_engine import GKEStartJobOperator
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from airflow.utils.dates import days_ago
 from kubernetes.client import V1ContainerPort
@@ -28,11 +29,12 @@ DBT_IMAGE = "gcr.io/iitj-capstone-project-group-18/dbt_image:latest"
 PYTHON_SCRIPT_IMAGE = "gcr.io/iitj-capstone-project-group-18/dbt_image:latest"  
 
 # Task 1: Run the Python script
-run_python_script = KubernetesPodOperator(
+run_python_script = GKEStartJobOperator(
     task_id="run_python_script",
     name="python-script-task",
     namespace=GKE_NAMESPACE,
     image=PYTHON_SCRIPT_IMAGE,
+    cluster_name=GKE_CLUSTER_NAME,
     cmds=["python"],
     arguments=["/app/Python_Script/main.py"],  # Path to the script in the container
     labels={"app": "python-script-task"},
@@ -40,11 +42,12 @@ run_python_script = KubernetesPodOperator(
     dag=dag,
 )
 # Task 2: Run dbt commands dbt run
-dbt_run = KubernetesPodOperator(
+dbt_run = GKEStartJobOperator(
     task_id="dbt_run",
     name="dbt-run-task",
     namespace=GKE_NAMESPACE,
     image=DBT_IMAGE,
+    cluster_name=GKE_CLUSTER_NAME,
     cmds=["dbt"],
     arguments=["run"],
     labels={"app": "dbt-task"},
@@ -52,11 +55,12 @@ dbt_run = KubernetesPodOperator(
     dag=dag,
 )
 # Task 3 : Run dbt command test
-dbt_test = KubernetesPodOperator(
+dbt_test = GKEStartJobOperator(
     task_id="dbt_test",
     name="dbt-test-task",
     namespace=GKE_NAMESPACE,
     image=DBT_IMAGE,
+    cluster_name=GKE_CLUSTER_NAME,
     cmds=["dbt"],
     arguments=["test"],
     labels={"app": "dbt-task"},
@@ -64,11 +68,12 @@ dbt_test = KubernetesPodOperator(
     dag=dag,
 )
 # Task 4 : Run dbt command docs generate
-dbt_docs_generate = KubernetesPodOperator(
+dbt_docs_generate = GKEStartJobOperator(
     task_id="dbt_docs_generate",
     name="dbt-docs-generate-task",
     namespace=GKE_NAMESPACE,
     image=DBT_IMAGE,
+    cluster_name=GKE_CLUSTER_NAME,
     cmds=["dbt"],
     arguments=["docs", "generate"],
     labels={"app": "dbt-docs-task"},
@@ -77,12 +82,13 @@ dbt_docs_generate = KubernetesPodOperator(
 )
 
 # Task 5 : Run dbt command docs serve
-dbt_docs_serve = KubernetesPodOperator(
+dbt_docs_serve = GKEStartJobOperator(
     task_id="dbt_docs_serve",
     name="dbt-docs-serve-task",
     namespace=GKE_NAMESPACE,
     image=DBT_IMAGE,
     cmds=["dbt"],
+    cluster_name=GKE_CLUSTER_NAME,
     arguments=["docs", "serve", "--host", "0.0.0.0", "--port", "8080"],
     labels={"app": "dbt-docs-task"},
     ports=[V1ContainerPort(container_port=8080, host_port=8080)],  # Use V1ContainerPort
