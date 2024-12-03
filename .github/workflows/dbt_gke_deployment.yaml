@@ -8,34 +8,38 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Checkout repository
-      - name: Checkout code
-        uses: actions/checkout@v3
-
+    # Step 1: Checkout code
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Create a JSON file
+      run: |
+        mkdir -p temp
+        echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > temp/cred.json
       # Step 2: Authenticate with Google Cloud
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
-      # Step 3: Configure Docker for GCP
-      - name: Configure Docker for GCP
-        run: gcloud auth configure-docker
+    # Step 3: Configure Docker for GCP
+    - name: Configure Docker for GCP
+      run: gcloud auth configure-docker
 
-      # Step 4: Debug file paths (optional)
-      - name: Debug Files
-        run: ls -R
+    # Step 4: Debug file paths (optional)
+    - name: Debug Files
+      run: ls -R
 
     # # Step 4: Build Docker image
-      - name: Build Docker Image
-        run: |
-          docker build --build-arg GCP_SERVICE_ACCOUNT_KEY="temp/cred.json" -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest .
+    - name: Build Docker Image
+      run: |
+        docker build --build-arg GCP_SERVICE_ACCOUNT_KEY="temp/cred.json" -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest .
 
-      # # Step 5: Push Docker image to Google Container Registry (GCR)
-      - name: Push Docker Image to GCR
-        run: |
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
+    # # Step 5: Push Docker image to Google Container Registry (GCR)
+    - name: Push Docker Image to GCR
+      run: |
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
 
     # # Step 6: Deploy to GKE
     # - name: Deploy to GKE
