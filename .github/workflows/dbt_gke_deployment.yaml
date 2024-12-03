@@ -16,8 +16,12 @@ jobs:
     - name: Create a JSON file
       run: |
         mkdir -p temp
-        echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > temp/cred.json
+        echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > .dbt/cred.json
       # Step 2: Authenticate with Google Cloud
+    # Step 4: Debug file paths (optional)
+    - name: Debug Files
+      run: ls -A
+
     - name: Authenticate with Google Cloud
       uses: google-github-actions/auth@v1
       with:
@@ -26,10 +30,6 @@ jobs:
     # Step 3: Configure Docker for GCP
     - name: Configure Docker for GCP
       run: gcloud auth configure-docker
-
-    # Step 4: Debug file paths (optional)
-    - name: Debug Files
-      run: ls -R
 
     # # Step 4: Build Docker image
     - name: Build Docker Image
