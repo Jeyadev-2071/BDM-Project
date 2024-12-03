@@ -41,6 +41,11 @@ jobs:
       run: |
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
 
+    - name: Authenticate to GKE
+      run: |
+        gcloud container clusters get-credentials bdm-project \
+          --region 'asia-south1' \
+          --project '${{ secrets.GCP_PROJECT_ID }}'
     # Step 6: Deploy to GKE
     - name: Deploy to GKE
       run: |
