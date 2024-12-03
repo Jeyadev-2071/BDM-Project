@@ -13,10 +13,13 @@ jobs:
     # # Step 1: Checkout code
     # - name: Checkout Code
     #   uses: actions/checkout@v3
-
+    - name: Create a JSON file
+      run: |
+        mkdir -p temp
+        echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > temp/cred.json
     - name: 'test'
       run: |
-          gcloud auth activate-service-account --key-file='${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
+          gcloud auth activate-service-account --key-file='temp/cred.json'
     # - name: 'auth'
     #   uses: 'google-github-actions/auth@v2'
     #   with:
