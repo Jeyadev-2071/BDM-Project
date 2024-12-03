@@ -41,24 +41,19 @@ jobs:
       run: |
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
 
-    - name: Set up Google Cloud SDK repository
+    - name: 'deploy with gke-deploy cli'
+      uses: 'google-github-actions/deploy-gke-container@v0.1'
+      with:
+        image: 'dbt_image'
+        app_name: ' dbt_pipeline'
+        region: 'asia-south1'
+        cluster_name: 'bdm-project'
+        project_id: 'iitj-capstone-project-group-18'
+        namespace: 'default'
+        expose: '8000'
+    
+    - name: 'get-deployments'
+      shell: bash
       run: |
-        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-        sudo apt-get update
-    - name: Install gke-gcloud-auth-plugin
-      run: |
-        sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
-    - name: Authenticate to GKE
-      run: |
-        gcloud container clusters get-credentials bdm-project \
-          --region 'asia-south1' \
-          --project "${{ secrets.GCP_PROJECT_ID }}"
-      env:
-        USE_GKE_GCLOUD_AUTH_PLUGIN: "true"
-
-    # Step 5: Apply Kubernetes Configurations
-    - name: Apply Kubernetes Configurations
-      run: |
-        kubectl apply -f k8s/deploy.yaml
-        kubectl apply -f k8s/service.yaml
+        kubectl get pods -n my-namespace
+        kubectl get deployment -n my-namespace
