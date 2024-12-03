@@ -31,7 +31,8 @@ def get_deployment_pod():
     """
     Find the pod name from the deployment based on the label selector.
     """
-    command = f"kubectl get pods -l {DEPLOYMENT_LABEL} -n {NAMESPACE} -o jsonpath='{{.items[0].metadata.name}}'"
+    temp = '.items[0].metadata.name'
+    command = f"""kubectl get pods -l {DEPLOYMENT_LABEL} -n {NAMESPACE} -o jsonpath='{temp}'"""
     result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
     pod_name = result.stdout.strip()
     print(f"Deployment pod name: {pod_name}")
