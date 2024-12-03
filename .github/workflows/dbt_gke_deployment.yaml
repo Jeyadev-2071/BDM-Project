@@ -21,7 +21,9 @@ jobs:
     - name: 'Authenticating with Gcloud using SA'
       run: |
           gcloud auth login  --cred-file='temp/cred.json'
-
+    - name: 'Setting SA Account as default'
+      run: |
+        gcloud config set account ACCOUNT
     - name: 'Setting Project ID'
       run: |
           gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
