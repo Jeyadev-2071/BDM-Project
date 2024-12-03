@@ -16,10 +16,10 @@ RUN pip install dbt-bigquery
 COPY . .
 
 # Add an ARG to accept the service account key
-ARG GCP_SERVICE_ACCOUNT_KEY
+# ARG GCP_SERVICE_ACCOUNT_KEY
 
-# Write the service account key to /app/.dbt/cred.json
-RUN echo "$GCP_SERVICE_ACCOUNT_KEY" > /app/.dbt/cred.json
+# # Write the service account key to /app/.dbt/cred.json
+# RUN echo "$GCP_SERVICE_ACCOUNT_KEY" > /app/.dbt/cred.json
 
 # Set permissions for the cred.json file
 RUN chmod 600 /app/.dbt/cred.json
