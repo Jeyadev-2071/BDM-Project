@@ -42,7 +42,7 @@ jobs:
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
 
     - name: 'deploy with gke-deploy cli'
-      uses: 'google-github-actions/deploy-gke-container@v0.1'
+      uses: 'google-github-actions/deploy-gke@v0.0.2'
       with:
         image: 'dbt_image'
         app_name: ' dbt_pipeline'
