@@ -20,4 +20,4 @@ RUN echo "$GCP_SERVICE_ACCOUNT_KEY" > /app/.dbt/cred.json
 RUN chmod 600 /app/.dbt/cred.json
 
 # Set the entry point to run dbt commands
-CMD ["dbt --version"]
+CMD ["sh", "-c", "dbt docs generate && dbt docs serve --host 0.0.0.0 --port 8080"]

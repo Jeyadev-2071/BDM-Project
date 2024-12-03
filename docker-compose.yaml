@@ -3,16 +3,15 @@ version: '3.9'
 services:
   dbt:
     build:
-      context: .  # Use the current directory to build the Docker image
-      dockerfile: Dockerfile
+      context: .
     container_name: dbt_bigquery
     volumes:
-      - .:/app                  # Mount the entire project directory
-      - ./dbt_packages:/app/dbt_packages  # Mount dbt packages
-      - ./logs:/app/logs        # Mount logs for dbt output
-      - ./.dbt:/root/.dbt       # Mount the `.dbt` folder containing profiles.yml
+      - .:/app                   # Mount the project directory
+      - ./.dbt:/root/.dbt        # Mount the .dbt directory containing profiles.yml
     environment:
-      DBT_PROFILES_DIR: /root/.dbt  # Point dbt to the profiles.yml location
+      DBT_PROFILES_DIR: /root/.dbt  # Specify the profiles.yml directory
+    ports:
+      - "8080:8080"              # Map port 8080 to serve docs
     stdin_open: true
     tty: true
-    command: tail -f /dev/null  # Keeps the container running
+    command: sh -c "dbt docs generate && dbt docs serve --host 0.0.0.0 --port 8080"
