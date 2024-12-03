@@ -1,70 +1,56 @@
-from datetime import datetime
 from airflow import DAG
-from airflow.operators.python import PythonOperator
-import subprocess
-import json
-# DAG configuration
+from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
+from airflow.providers.google.cloud.hooks.kubernetes_engine import GKEHook
+from airflow.utils.dates import days_ago
+
+# Default arguments for the DAG
 default_args = {
-    "owner": "airflow",
-    "depends_on_past": False,
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "retries": 1,
+    'owner': 'your_name',
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
 }
 
-dag = DAG(
-    "execute_on_deployment_pod",
+# Define the DAG
+with DAG(
+    'gke_dbt_pipeline',
     default_args=default_args,
-    description="Run dbt commands on existing Deployment pods",
-    schedule_interval=None,
-    start_date=datetime(2023, 1, 1),
+    description='Authenticate Airflow with GKE and run dbt pipeline',
+    schedule_interval='@daily',  # Adjust schedule as needed
+    start_date=days_ago(1),
     catchup=False,
-)
+) as dag:
 
-# Kubernetes Deployment configuration
-DEPLOYMENT_LABEL = "app=dbt-deployement"  # Label of your Deployment
-NAMESPACE = "default"
+    # Task: Authenticate Airflow to GKE
+    def get_kube_config():
+        """Authenticate to GKE and get kubeconfig."""
+        gke_hook = GKEHook(
+            gcp_conn_id='google_cloud_default',  # Replace with your GCP connection ID in Airflow
+        )
+        kube_config = gke_hook.get_cluster_config(
+            project_id='iitj-capstone-project-group-18',  
+            name='bdm-project',  # Replace with your GKE cluster name
+            location='asia-south1	',  # Replace with the region/zone of your cluster
+        )
+        return kube_config
 
+    # Task: Run dbt pipeline on GKE
+    run_dbt_task = KubernetesPodOperator(
+        namespace='default',  # Replace with your Kubernetes namespace
+        image='gcr.io/iitj-capstone-project-group-18/dbt-image:latest', 
+        cmds=['/bin/bash', '-c'],
+        arguments=[
+            'python3 /app/script.py && '
+            'dbt run && dbt test && dbt docs generate'
+        ],  # Example commands to execute
+        labels={'app': 'dbt-pipeline'},
+        name='run-dbt',
+        task_id='run_dbt',
+        get_logs=True,
+        is_delete_operator_pod=True,  # Clean up the pod after execution
+        config_file='/path/to/kubeconfig',  # Use the kubeconfig retrieved by get_kube_config()
+    )
 
-# Step 1: Find the pod name dynamically
-def get_deployment_pod():
-    """
-    Find the pod name from the deployment based on the label selector.
-    """
-    command = f"kubectl get pods -l {DEPLOYMENT_LABEL} -n {NAMESPACE} -o json"
-    result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-    pod_name = result.stdout.strip()
-    prod_name = json.loads(pod_name)
-    temp = prod_name['items']
-    pod_name=temp[0]['metadata']['name']
-    return pod_name
-
-
-# Step 2: Execute a dbt command in the deployment pod
-def run_command_in_pod(command):
-    """
-    Run a command (e.g., dbt run) in the deployment pod.
-    """
-    pod_name = get_deployment_pod()
-    exec_command = f"kubectl exec -it {pod_name} -n {NAMESPACE} -- {command}"
-    subprocess.run(exec_command, shell=True, check=True)
-    print(f"Executed command in pod {pod_name}: {command}")
-
-
-# Airflow tasks
-dbt_run_task = PythonOperator(
-    task_id="dbt_run",
-    python_callable=run_command_in_pod,
-    op_args=["dbt run"],  # Command to run in the pod
-    dag=dag,
-)
-
-dbt_test_task = PythonOperator(
-    task_id="dbt_test",
-    python_callable=run_command_in_pod,
-    op_args=["dbt test"],  # Command to run in the pod
-    dag=dag,
-)
-
-# Task dependencies
-dbt_run_task >> dbt_test_task
+    # Dependency: Ensure authentication is done before running the task
+    run_dbt_task
