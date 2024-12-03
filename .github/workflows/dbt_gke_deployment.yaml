@@ -3,7 +3,9 @@ name: Deploy Docker to GKE
 on:
   push:
     branches:
-      - master  
+      - master
+    path:
+      - "!dags/**"
 
 jobs:
   build-and-deploy:

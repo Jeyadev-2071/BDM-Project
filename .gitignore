@@ -1,4 +1,4 @@
-.github
+# .github
 .git
 target/
 dbt_packages/
