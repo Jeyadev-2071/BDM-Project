@@ -20,17 +20,10 @@ jobs:
     - name: 'test'
       run: |
           gcloud auth login  --cred-file='temp/cred.json'
-    # - name: 'auth'
-    #   uses: 'google-github-actions/auth@v2'
-    #   with:
-    #     credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
-    #     create_credentials_file: true
-    #     project_id: ${{ secrets.GCP_PROJECT_ID }}
-
     - run: |-
         gcloud --quiet auth configure-docker
-      
-    # Step 3: Authenticate with GKE
+    - run: |
+        gcloud auth activate-service-account --key-file='temp/cred.json'
     - id: 'get-credentials'
       run: |
         gcloud container clusters get-credentials bdm-project --region asia-south1 --project iitj-capstone-project-group-18
