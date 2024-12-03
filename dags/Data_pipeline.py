@@ -2,6 +2,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from airflow.utils.dates import days_ago
+from kubernetes.client import V1ContainerPort
 # DAG configuration
 default_args = {
     "owner": "airflow",
@@ -38,7 +39,7 @@ run_python_script = KubernetesPodOperator(
     get_logs=True,
     dag=dag,
 )
-# Task 2: Run dbt commands (dbt run, dbt test, etc.)
+# Task 2: Run dbt commands dbt run
 dbt_run = KubernetesPodOperator(
     task_id="dbt_run",
     name="dbt-run-task",
@@ -50,6 +51,7 @@ dbt_run = KubernetesPodOperator(
     get_logs=True,
     dag=dag,
 )
+# Task 3 : Run dbt command test
 dbt_test = KubernetesPodOperator(
     task_id="dbt_test",
     name="dbt-test-task",
@@ -61,7 +63,7 @@ dbt_test = KubernetesPodOperator(
     get_logs=True,
     dag=dag,
 )
-
+# Task 4 : Run dbt command docs generate
 dbt_docs_generate = KubernetesPodOperator(
     task_id="dbt_docs_generate",
     name="dbt-docs-generate-task",
@@ -74,7 +76,7 @@ dbt_docs_generate = KubernetesPodOperator(
     dag=dag,
 )
 
-# Task 2: Run dbt docs serve
+# Task 5 : Run dbt command docs serve
 dbt_docs_serve = KubernetesPodOperator(
     task_id="dbt_docs_serve",
     name="dbt-docs-serve-task",
@@ -83,11 +85,10 @@ dbt_docs_serve = KubernetesPodOperator(
     cmds=["dbt"],
     arguments=["docs", "serve", "--host", "0.0.0.0", "--port", "8080"],
     labels={"app": "dbt-docs-task"},
-    ports=[{"containerPort": 8080, "hostPort": 8080}],
+    ports=[V1ContainerPort(container_port=8080, host_port=8080)],  # Use V1ContainerPort
     get_logs=True,
     is_delete_operator_pod=False,  # Keep the pod running to serve the docs
     dag=dag,
 )
-
 # Set task dependencies
 run_python_script >> dbt_run >> dbt_test >> dbt_docs_generate >> dbt_docs_serve
