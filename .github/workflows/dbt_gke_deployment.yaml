@@ -50,4 +50,4 @@ jobs:
     # Step 7: Verify deployment
     - name: Verify Deployment
       run: |
-        kubectl rollout status deployment/${{ dbt-deployement }}
+        kubectl rollout status deployment/dbt-deployement
