@@ -6,7 +6,7 @@ on:
       - master
     paths:
       - "dags/**"
-      - ".github/worflows/airflow_deployment.yaml"
+      - ".github/workflows/airflow_deployment.yaml"
 
 jobs:
   deploy-airflow:
