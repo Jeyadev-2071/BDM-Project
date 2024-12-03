@@ -20,4 +20,7 @@ RUN echo "$GCP_SERVICE_ACCOUNT_KEY" > /app/.dbt/cred.json
 RUN chmod 600 /app/.dbt/cred.json
 ENV DBT_PROFILES_DIR=/app/.dbt
 # Set the entry point to run dbt commands
-CMD ["sh", "-c", "dbt docs generate && dbt docs serve --host 0.0.0.0 --port 8080"]
+CMD sh -c "if [ -f /root/.dbt/cred.json ]; then \
+  echo 'Cred file is present in /root/.dbt'; \
+  else echo 'Error: cred.json not found in /root/.dbt'; \
+fi; tail -f /dev/null"

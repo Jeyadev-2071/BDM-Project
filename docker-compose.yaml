@@ -7,7 +7,7 @@ services:
     container_name: dbt_bigquery
     volumes:
       - .:/app                   # Mount the project directory
-      - ./.dbt:/root/.dbt        # Mount the .dbt directory containing profiles.yml
+      #- ./.dbt:/root/.dbt        # Mount the .dbt directory containing profiles.yml
     environment:
       DBT_PROFILES_DIR: /app/.dbt  # Specify the profiles.yml directory
     ports:
@@ -15,7 +15,7 @@ services:
     stdin_open: true
     tty: true
     command: |
-      sh -c "if [ -f /root/.dbt/cred.json ]; then \
-        dbt docs generate && dbt docs serve --host 0.0.0.0 --port 8080; \
-        else echo 'Error: cred.json not found in /root/.dbt' && exit 1; \
-      fi"
+      sh -c "if [ -f /app/.dbt/cred.json ]; then \
+        echo 'Cred file is present in /root/.dbt'; \
+        else echo 'Error: cred.json not found in /root/.dbt'; \
+      fi; tail -f /dev/null"
