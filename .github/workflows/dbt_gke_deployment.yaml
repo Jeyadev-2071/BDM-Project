@@ -41,13 +41,13 @@ jobs:
       run: |
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
 
-    # # Step 6: Deploy to GKE
-    # - name: Deploy to GKE
-    #   run: |
-    #     kubectl apply -f k8s/deployment.yaml  # Replace with your Kubernetes deployment file path
-    #     kubectl apply -f k8s/service.yaml     # Replace with your Kubernetes service file path
+    # Step 6: Deploy to GKE
+    - name: Deploy to GKE
+      run: |
+        kubectl apply -f k8s/deployment.yaml  # Replace with your Kubernetes deployment file path
+        kubectl apply -f k8s/service.yaml     # Replace with your Kubernetes service file path
 
-    # # Step 7: Verify deployment
-    # - name: Verify Deployment
-    #   run: |
-    #     kubectl rollout status deployment/${{ secrets.K8S_DEPLOYMENT_NAME }}
+    # Step 7: Verify deployment
+    - name: Verify Deployment
+      run: |
+        kubectl rollout status deployment/${{ dbt-deployement }}
