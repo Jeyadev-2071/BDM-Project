@@ -1,7 +1,7 @@
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
-
+from airflow.utils.dates import days_ago
 # DAG configuration
 default_args = {
     "owner": "airflow",
@@ -14,8 +14,8 @@ dag = DAG(
     "kubernetes_dbt_workflow",
     default_args=default_args,
     description="Run Python and dbt commands on Kubernetes using KubernetesPodOperator",
-    schedule_interval=None,
-    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    start_date=days_ago(1),
     catchup=False,
 )
 # Configurations
