@@ -41,19 +41,15 @@ jobs:
       run: |
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
 
-    - name: 'deploy with gke-deploy cli'
-      uses: 'google-github-actions/deploy-gke@v0.0.2'
+    - name: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v2'
       with:
-        image: 'dbt_image'
-        app_name: ' dbt_pipeline'
-        region: 'asia-south1'
         cluster_name: 'bdm-project'
-        project_id: 'iitj-capstone-project-group-18'
-        namespace: 'default'
-        expose: '8000'
+        location: 'asia-south1'
     
-    - name: 'get-deployments'
+    - name: 'deploy'
       shell: bash
       run: |
-        kubectl get pods -n my-namespace
-        kubectl get deployment -n my-namespace
+        kubectl apply -f k8s\deploy.yaml
+        kubectl get pods 
+        kubectl get deployment
