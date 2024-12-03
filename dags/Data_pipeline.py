@@ -20,7 +20,7 @@ with DAG(
     run_python_script = BashOperator(
         task_id='run_python_script',
         bash_command=(
-            'kubectl exec -i -t deployment/dbt-deployement --'
+            'kubectl exec -i -t deployment/dbt-deployement -- '
             'python3 Python_Scripts/main.py'
         ),
     )
@@ -28,7 +28,7 @@ with DAG(
     run_dbt_commands = BashOperator(
         task_id='run_dbt_commands',
         bash_command=(
-            'kubectl exec -i -t deployment/dbt-deployement --'
+            'kubectl exec -i -t deployment/dbt-deployement -- '
             'bash -c "dbt run && dbt test && dbt docs generate"'
         ),
     )
