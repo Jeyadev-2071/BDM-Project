@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # # Step 1: Checkout code
-    # - name: Checkout Code
-    #   uses: actions/checkout@v3
+    # Step 1: Checkout code
+    - name: Checkout Code
+      uses: actions/checkout@v3
     - name: Create a JSON file
       run: |
         mkdir -p temp
