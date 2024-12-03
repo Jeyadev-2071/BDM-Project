@@ -30,7 +30,9 @@ jobs:
     # Step 4: Build Docker image
     - name: Build Docker Image
       run: |
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest .
+        docker build \
+          --build-arg GCP_SERVICE_ACCOUNT_KEY="${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" \
+          -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest .
 
     # Step 5: Push Docker image to Google Container Registry (GCR)
     - name: Push Docker Image to GCR

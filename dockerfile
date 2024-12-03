@@ -1,22 +1,23 @@
-# Use the official Python image as the base
-FROM python:3.9-slim
+# Base image (choose Python-based image to support dbt)
+FROM python:3.11-slim
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install dbt and other Python dependencies
-RUN pip install --upgrade pip
-RUN pip install dbt-core
+# Install dbt-bigquery
 RUN pip install dbt-bigquery
 
-# Copy project files into the container
-COPY . /app
+# Copy the rest of the dbt project files to /app
+COPY . .
 
-# Default command
-CMD ["dbt", "--version"]
+# Add an ARG to accept the service account key
+ARG GCP_SERVICE_ACCOUNT_KEY
+
+# Write the service account key to /app/.dbt/cred.json
+RUN echo "$GCP_SERVICE_ACCOUNT_KEY" > /app/.dbt/cred.json
+
+# Set permissions for the cred.json file
+RUN chmod 600 /app/.dbt/cred.json
+
+# Set the entry point to run dbt commands
+CMD ["dbt"]
