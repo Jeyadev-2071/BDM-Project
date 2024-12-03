@@ -54,7 +54,7 @@ jobs:
     - name: 'deploy'
       shell: bash
       run: |
-        kubectl apply -f k8s/deploy.yaml
-        kubectl rollout restart deployment <deployment-name>
+        kubectl apply -f k8s/deploy.yaml 
+        kubectl rollout restart deployment dbt-deployement 
         kubectl get pods
         kubectl get deployment
