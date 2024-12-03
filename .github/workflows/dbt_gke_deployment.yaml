@@ -44,7 +44,7 @@ jobs:
     # Step 6: Deploy to GKE
     - name: Deploy to GKE
       run: |
-        kubectl apply -f k8s/deployment.yaml  # Replace with your Kubernetes deployment file path
+        kubectl apply -f k8s/deploy.yaml  # Replace with your Kubernetes deployment file path
         kubectl apply -f k8s/service.yaml     # Replace with your Kubernetes service file path
 
     # Step 7: Verify deployment
