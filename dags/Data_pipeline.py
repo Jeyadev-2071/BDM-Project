@@ -96,7 +96,7 @@ dbt_docs_serve = GKEStartJobOperator(
     cluster_name=GKE_CLUSTER_NAME,
     arguments=["docs", "serve", "--host", "0.0.0.0", "--port", "8080"],
     labels={"app": "dbt-docs-task"},
-    ports=[V1ContainerPort(container_port=8080, host_port=8080)],  # Use V1ContainerPort
+    ports=[V1ContainerPort(container_port=8080)],  # Use V1ContainerPort
     get_logs=True,
     is_delete_operator_pod=False,  # Keep the pod running to serve the docs
     dag=dag,
