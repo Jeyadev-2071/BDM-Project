@@ -20,7 +20,9 @@ ENV  GOOGLE_APPLICATION_CREDENTIALS="/app/.dbt/cred.json"
 # Set permissions for the cred.json file
 RUN chmod 600 /app/.dbt/cred.json
 ENV DBT_PROFILES_DIR=/app/.dbt
+
 # Set the entry point to run dbt commands
+RUN chmod +x Python_Script/main.py
 
 CMD sh -c "if [ -f .dbt/cred.json ]; then \
   echo 'Cred file is present in /app/.dbt'; \
