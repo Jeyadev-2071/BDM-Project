@@ -22,7 +22,7 @@ dag = DAG(
 )
 
 # Kubernetes Deployment configuration
-DEPLOYMENT_LABEL = "app=dbt-deployment"  # Label of your Deployment
+DEPLOYMENT_LABEL = "app:dbt-deployement"  # Label of your Deployment
 NAMESPACE = "default"
 
 
