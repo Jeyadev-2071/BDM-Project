@@ -40,26 +40,25 @@ jobs:
     - name: Push Docker Image to GCR
       run: |
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
-    # - name: Install gke-gcloud-auth-plugin
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
-    # - name: Authenticate to GKE
-    #   run: |
-    #     gcloud container clusters get-credentials bdm-project \
-    #       --region 'asia-south1' \
-    #       --project '${{ secrets.GCP_PROJECT_ID }}'
-    #   env:
-    #     USE_GKE_GCLOUD_AUTH_PLUGIN: "true"
-    - name: Set up Kustomize
-      run: |-
-        curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
-        chmod u+x ./kustomize
-    # Step 6: Deploy to GKE
-    # Deploy the Docker image to the GKE cluster
-    - name: Deploy
-      run: |-
-        ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
-        ./kustomize build . | kubectl apply -f -
-        kubectl rollout status deployment/ bdm-deployment
-        kubectl get services -o wide
+
+    - name: Set up Google Cloud SDK repository
+      run: |
+        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+        sudo apt-get update
+    - name: Install gke-gcloud-auth-plugin
+      run: |
+        sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+    - name: Authenticate to GKE
+      run: |
+        gcloud container clusters get-credentials bdm-project \
+          --region 'asia-south1' \
+          --project "${{ secrets.GCP_PROJECT_ID }}"
+      env:
+        USE_GKE_GCLOUD_AUTH_PLUGIN: "true"
+
+    # Step 5: Apply Kubernetes Configurations
+    - name: Apply Kubernetes Configurations
+      run: |
+        kubectl apply -f k8s/deploy.yaml
+        kubectl apply -f k8s/service.yaml
