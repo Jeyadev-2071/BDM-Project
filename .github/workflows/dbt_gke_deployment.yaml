@@ -19,7 +19,7 @@ jobs:
         echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > temp/cred.json
     - name: 'test'
       run: |
-          gcloud auth activate-service-account --key-file='temp/cred.json'
+          gcloud auth login  --key-file='temp/cred.json'
     # - name: 'auth'
     #   uses: 'google-github-actions/auth@v2'
     #   with:
