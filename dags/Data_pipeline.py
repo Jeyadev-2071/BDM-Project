@@ -2,7 +2,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 import subprocess
-
+import json
 # DAG configuration
 default_args = {
     "owner": "airflow",
@@ -31,11 +31,12 @@ def get_deployment_pod():
     """
     Find the pod name from the deployment based on the label selector.
     """
-    temp = '{.items[0].metadata.name}'
-    command = f"kubectl get pods -l {DEPLOYMENT_LABEL} -n {NAMESPACE} -o jsonpath='{temp}'"
+    command = f"kubectl get pods -l {DEPLOYMENT_LABEL} -n {NAMESPACE} -o json"
     result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
     pod_name = result.stdout.strip()
-    print(f"Deployment pod name: {pod_name}")
+    prod_name = json.loads(pod_name)
+    temp = prod_name['items']
+    pod_name=temp[0]['metadata']['name']
     return pod_name
 
 
