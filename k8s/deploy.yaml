@@ -16,7 +16,7 @@ spec:
         app: dbt-deployement
     spec:
       containers:
-      - name: my-container
+      - name: bdm-container
         image: gcr.io/bdm-project/dbt_image:latest
         ports:
         - containerPort: 8080
