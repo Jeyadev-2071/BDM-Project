@@ -26,7 +26,7 @@ jobs:
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
-        service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+        create_credentials_file: true
         project_id: ${{ secrets.GCP_PROJECT_ID }}
 
     - run: |-
