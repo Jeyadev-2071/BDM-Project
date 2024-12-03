@@ -23,15 +23,11 @@ jobs:
         export_default_credentials: true
       
     # Step 3: Authenticate with GKE
-    - name: Authenticate to GKE
-      run: |
-        apt-get install -qq -y gettext
-        echo  ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }} > ${HOME}/gcloud-service-key.json
-        gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-        gcloud --quiet config set project ${{ secrets.GCP_PROJECT_ID }}
-        gcloud --quiet config set compute/zone asia-south1
-        gcloud --quiet container clusters get-credentials bdm-project
-        
+    - id: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v2'
+      with:
+        cluster_name: 'bdm-project'
+        location: 'asia-south1'
 
     # Step 4: Build Docker image
     - name: Build Docker Image
