@@ -17,13 +17,19 @@ jobs:
       run: |
         mkdir -p temp
         echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > temp/cred.json
-    - name: 'test'
+    - name: 'Authenticating with Gcloud using SA'
       run: |
           gcloud auth login  --cred-file='temp/cred.json'
+    - name: 'Setting Project ID'
+      run: |
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+    - name: 'Configuring Docker'
     - run: |-
         gcloud --quiet auth configure-docker
+    - name: 'Activating SA account'
     - run: |
         gcloud auth activate-service-account --key-file='temp/cred.json'
+
     - id: 'get-credentials'
       run: |
         gcloud container clusters get-credentials bdm-project --region asia-south1 --project iitj-capstone-project-group-18
