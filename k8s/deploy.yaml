@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbt-deployement
+  namespace: default
+  labels:
+    app: dbt-deployement
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dbt-deployement
+  template:
+    metadata:
+      labels:
+        app: dbt-deployement
+    spec:
+      containers:
+      - name: my-container
+        image: gcr.io/bdm-project/dbt_image:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
