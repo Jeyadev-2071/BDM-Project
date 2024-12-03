@@ -50,7 +50,7 @@ jobs:
           --region 'asia-south1' \
           --project '${{ secrets.GCP_PROJECT_ID }}'
       env:
-      USE_GKE_GCLOUD_AUTH_PLUGIN: "true"
+        USE_GKE_GCLOUD_AUTH_PLUGIN: "true"
     # Step 6: Deploy to GKE
     - name: Deploy to GKE
       run: |
