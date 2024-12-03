@@ -49,7 +49,7 @@ with DAG(
         task_id='run_dbt',
         get_logs=True,
         is_delete_operator_pod=True,  # Clean up the pod after execution
-        config_file='/path/to/kubeconfig',  # Use the kubeconfig retrieved by get_kube_config()
+        config_file=get_kube_config(),  # Use the kubeconfig retrieved by get_kube_config()
     )
 
     # Dependency: Ensure authentication is done before running the task
