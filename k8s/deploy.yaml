@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: bdm-container
-        image: gcr.io/bdm-project/dbt_image:latest
+        image: gcr.io/iitj-capstone-project-group-18/dbt_image:latest
         ports:
         - containerPort: 8080
         resources:
