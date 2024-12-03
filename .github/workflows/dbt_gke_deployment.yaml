@@ -20,7 +20,7 @@ jobs:
       # Step 2: Authenticate with Google Cloud
     # Step 4: Debug file paths (optional)
     - name: Debug Files
-      run: ls -A
+      run: ls .dbt -A
 
     - name: Authenticate with Google Cloud
       uses: google-github-actions/auth@v1

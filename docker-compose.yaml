@@ -13,5 +13,9 @@ services:
     ports:
       - "8080:8080"              # Map port 8080 to serve docs
     stdin_open: true
-    command: sh -c "dbt docs generate && dbt docs serve --host 0.0.0.0 --port 8080"
-
+    tty: true
+    command: |
+      sh -c "if [ -f /root/.dbt/cred.json ]; then \
+        dbt docs generate && dbt docs serve --host 0.0.0.0 --port 8080; \
+        else echo 'Error: cred.json not found in /root/.dbt' && exit 1; \
+      fi"
