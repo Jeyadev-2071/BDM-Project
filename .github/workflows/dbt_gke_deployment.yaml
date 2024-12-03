@@ -16,7 +16,7 @@ jobs:
 
     - name: Create a JSON file
       run: |
-        echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"" > .dbt/cred.json
+        echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > .dbt/cred.json
 
     - name: Check JSON file
       run: |
