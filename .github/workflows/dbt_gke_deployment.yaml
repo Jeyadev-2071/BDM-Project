@@ -34,11 +34,13 @@ jobs:
       
     # Step 3: Authenticate with GKE
     - id: 'get-credentials'
-      uses: 'google-github-actions/get-gke-credentials@v2'
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        cluster_name: 'bdm-project'
-        location: 'asia-south1'
+      run: |
+        gcloud container clusters get-credentials bdm-project --region asia-south1 --project iitj-capstone-project-group-18
+      # uses: 'google-github-actions/get-gke-credentials@v2'
+      # with:
+      #   project_id: ${{ secrets.GCP_PROJECT_ID }}
+      #   cluster_name: 'bdm-project'
+      #   location: 'asia-south1'
         #credentials: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
 
     # Step 4: Build Docker image
