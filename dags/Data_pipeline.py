@@ -38,7 +38,6 @@ run_python_script = KubernetesPodOperator(
     get_logs=True,
     dag=dag,
 )
-
 # Task 2: Run dbt commands (dbt run, dbt test, etc.)
 dbt_run = KubernetesPodOperator(
     task_id="dbt_run",
@@ -63,5 +62,32 @@ dbt_test = KubernetesPodOperator(
     dag=dag,
 )
 
+dbt_docs_generate = KubernetesPodOperator(
+    task_id="dbt_docs_generate",
+    name="dbt-docs-generate-task",
+    namespace=GKE_NAMESPACE,
+    image=DBT_IMAGE,
+    cmds=["dbt"],
+    arguments=["docs", "generate"],
+    labels={"app": "dbt-docs-task"},
+    get_logs=True,
+    dag=dag,
+)
+
+# Task 2: Run dbt docs serve
+dbt_docs_serve = KubernetesPodOperator(
+    task_id="dbt_docs_serve",
+    name="dbt-docs-serve-task",
+    namespace=GKE_NAMESPACE,
+    image=DBT_IMAGE,
+    cmds=["dbt"],
+    arguments=["docs", "serve", "--host", "0.0.0.0", "--port", "8080"],
+    labels={"app": "dbt-docs-task"},
+    ports=[{"containerPort": 8080, "hostPort": 8080}],
+    get_logs=True,
+    is_delete_operator_pod=False,  # Keep the pod running to serve the docs
+    dag=dag,
+)
+
 # Set task dependencies
-run_python_script >> dbt_run >> dbt_test
+run_python_script >> dbt_run >> dbt_test >> dbt_docs_generate >> dbt_docs_serve
