@@ -15,7 +15,7 @@ RUN pip install google-cloud-bigquery pandas pyarrow numpy
 # Copy the rest of the dbt project files to /app
 COPY . .
 
-ENV  GOOGLE_APPLICATION_CREDENTIALS = ".dbt/cred.json"
+ENV  GOOGLE_APPLICATION_CREDENTIALS = "/app/.dbt/cred.json"
 
 # Set permissions for the cred.json file
 RUN chmod 600 /app/.dbt/cred.json
