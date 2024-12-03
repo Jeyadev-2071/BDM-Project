@@ -17,7 +17,7 @@ jobs:
       run: |
         mkdir -p temp
         echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > temp/cred.json
-        
+
     - name: 'Authenticating with Gcloud using SA'
       run: |
           gcloud auth login  --cred-file='temp/cred.json'
@@ -31,7 +31,7 @@ jobs:
         gcloud --quiet auth configure-docker
 
     - name: 'Activating SA account'
-    - run: |
+      run: |
         gcloud auth activate-service-account --key-file='temp/cred.json'
 
     - id: 'get-credentials'
