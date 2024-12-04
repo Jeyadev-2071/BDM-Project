@@ -6,7 +6,46 @@ from google.oauth2 import service_account
 import logging
 import os
 import json
+import subprocess
+def check_dbt_version():
+    """Function to check dbt version."""
+    try:
+        result = subprocess.run(["dbt", "--version"], capture_output=True, text=True, check=True)
+        logging.info(f"DBT Version Output:\n{result.stdout}")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error checking dbt version: {e.stderr}")
+        raise
 
+
+def dbt_run():
+    """Function to run dbt models."""
+    try:
+        result = subprocess.run(
+            ["dbt", "run"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        logging.info(f"DBT Run Output:\n{result.stdout}")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error running dbt: {e.stderr}")
+        raise
+
+
+def dbt_test():
+    """Function to run dbt tests."""
+    try:
+        result = subprocess.run(
+            ["dbt", "test"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        logging.info(f"DBT Test Output:\n{result.stdout}")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error running dbt tests: {e.stderr}")
+        raise
+    
 def list_gke_nodes(**kwargs):
     try:
         # Load the service account JSON content from an environment variable
@@ -65,3 +104,22 @@ with DAG(
         python_callable=list_gke_nodes,
         provide_context=True,
     )
+    
+    check_dbt_version_task = PythonOperator(
+        task_id='check_dbt_version',
+        python_callable=check_dbt_version,
+    )
+    
+    dbt_run_task = PythonOperator(
+        task_id='dbt_run',
+        python_callable=dbt_run,
+    )
+
+    # Task to run dbt tests
+    dbt_test_task = PythonOperator(
+        task_id='dbt_test',
+        python_callable=dbt_test,
+    )
+
+    # Task dependencies
+    check_gke_access >> check_dbt_version_task >> dbt_run_task >> dbt_test_task
