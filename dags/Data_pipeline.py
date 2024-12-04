@@ -20,7 +20,7 @@ def run_dbt_in_gke(command, namespace="default", pod_name="dbt-deployement-5dc96
         # Ensure kubectl is set up to communicate with the cluster
         logging.info(f"Ensuring kubectl context is set for cluster: {cluster_name}")
         subprocess.run(
-            ["gcloud", "container", "clusters", "get-credentials", cluster_name, "--zone", "your-cluster-zone"],
+            ["gcloud", "container", "clusters", "get-credentials", cluster_name, "--zone", "asia-south1"],
             check=True,
             capture_output=True,
             text=True
@@ -47,11 +47,11 @@ def check_dbt_version_in_gke():
 
 
 def dbt_run_in_gke():
-    run_dbt_in_gke("dbt run --profiles-dir /path/to/your/profiles")
+    run_dbt_in_gke("dbt run")
 
 
 def dbt_test_in_gke():
-    run_dbt_in_gke("dbt test --profiles-dir /path/to/your/profiles")
+    run_dbt_in_gke("dbt test")
 
 
 # Default arguments for the DAG
