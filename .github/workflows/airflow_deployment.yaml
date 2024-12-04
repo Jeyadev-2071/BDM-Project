@@ -39,4 +39,4 @@ jobs:
     
     - name: Upload DAG to Composer
       run: |
-        gcloud storage cp ./dags/Data_pipeline.py gs://asia-south1-bdm-project-sch-34306c64-bucket/dags
+        gcloud storage cp ./dags/Data_pipeline.py gs://asia-south1-bdm-project-6ac1b129-bucket/dags
