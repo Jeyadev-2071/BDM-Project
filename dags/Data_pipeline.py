@@ -71,7 +71,7 @@ def list_gke_nodes(**kwargs):
         cluster_path = client.cluster_path(project_id, location, cluster_name)
 
         # Get the cluster details
-        cluster = client.get_cluster(name=cluster_path)
+        cluster = client.get_cluster()
 
         # Log the cluster details
         logging.info(f"Cluster Name: {cluster.name}")
@@ -122,4 +122,4 @@ with DAG(
     )
 
     # Task dependencies
-    check_gke_access >> check_dbt_version_task >> dbt_run_task >> dbt_test_task
+    check_dbt_version_task >> dbt_run_task >> dbt_test_task
