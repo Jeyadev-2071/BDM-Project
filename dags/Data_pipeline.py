@@ -17,7 +17,16 @@ with DAG(
     schedule_interval=None,
     catchup=False,
 ) as dag:
-
+    
+    check_directory_task = KubernetesPodOperator(
+        task_id='check_working_directory',
+        name='check-working-directory',
+        namespace='default',
+        image= DBT_IMAGE,  # Replace with your container image
+        cmds=["sh", "-c"],
+        arguments=["pwd"],
+        is_delete_operator_pod=True,
+    )
     # Task to check dbt version
     check_dbt_version = KubernetesPodOperator(
         task_id='check_dbt_version',
@@ -36,7 +45,7 @@ with DAG(
         namespace=GKE_NAMESPACE,
         image=DBT_IMAGE,
         cmds=["sh", "-c"],
-        arguments=["dbt run --profiles-dir /path/to/your/profiles"],
+        arguments=["dbt run"],
         is_delete_operator_pod=True,
     )
 
@@ -47,9 +56,9 @@ with DAG(
         namespace=GKE_NAMESPACE,
         image=DBT_IMAGE,
         cmds=["sh", "-c"],
-        arguments=["dbt test --profiles-dir /path/to/your/profiles"],
+        arguments=["dbt test"],
         is_delete_operator_pod=True,
     )
 
     # Task dependencies
-    check_dbt_version >> dbt_run >> dbt_test
+    check_directory_task >> check_dbt_version >> dbt_run >> dbt_test
