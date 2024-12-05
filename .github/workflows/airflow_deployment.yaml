@@ -1,0 +1,42 @@
+name: Deploy airflow dag to GCP
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "dags/**"
+      - ".github/workflows/airflow_deployment.yaml"
+
+jobs:
+  deploy-airflow:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the code
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # Step 2: Authenticate with Google Cloud
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+    # Step 3: Set GOOGLE_APPLICATION_CREDENTIALS environment variable
+    - name: Set Environment Variable for Authentication
+      run: |
+        echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > /tmp/service_account_key.json
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/service_account_key.json
+
+    # # Step 4: Verify GCS bucket existence
+    # - name: Verify GCS Bucket
+    #   run: |
+    #     gsutil ls gs://${{ secrets.GCP_BUCKET_NAME }} || gsutil mb -l ${GCP_REGION} gs://${{ secrets.GCP_BUCKET_NAME }}
+    #   env:
+    #     GCP_REGION: "asia-south1"  # Replace with your GCP bucket region
+    
+    - name: Upload DAG to Composer
+      run: |
+        gcloud storage cp ./dags/Data_pipeline.py gs://asia-south1-bdm-project-6ac1b129-bucket/dags

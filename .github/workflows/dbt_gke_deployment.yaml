@@ -3,7 +3,10 @@ name: Deploy Docker to GKE
 on:
   push:
     branches:
-      - master  
+      - master
+    paths:
+      - "!dags/**"
+      - "!.github/workflows/airflow_deployment.yaml"
 
 jobs:
   build-and-deploy:
@@ -14,38 +17,47 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # Step 2: Set up Google Cloud SDK
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Create a JSON file
+      run: |
+        echo "${{ secrets.JSON_FILE }}" > .dbt/cred.json
+        
+    - name: Check JSON file
+      run: |
+        cat .dbt/cred.json
+    # Step 4: Debug file paths (optional)
+    - name: Debug Files
+      run: ls .dbt -A
+
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
-    # Step 3: Authenticate with GKE
-    - name: Authenticate to GKE
-      run: |
-        gcloud container clusters get-credentials bdm-project \
-          --region asia-south1 \
-          --project ${{ secrets.GCP_PROJECT_ID }}
+    # Step 3: Configure Docker for GCP
+    - name: Configure Docker for GCP
+      run: gcloud auth configure-docker
 
-    # Step 4: Build Docker image
+    # # Step 4: Build Docker image
     - name: Build Docker Image
       run: |
-        docker build \
-          --build-arg GCP_SERVICE_ACCOUNT_KEY="${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" \
-          -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest .
+        docker build --build-arg GCP_SERVICE_ACCOUNT_KEY="temp/cred.json" -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest .
 
-    # Step 5: Push Docker image to Google Container Registry (GCR)
+    # # Step 5: Push Docker image to Google Container Registry (GCR)
     - name: Push Docker Image to GCR
       run: |
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/dbt_image:latest
 
-    # Step 6: Deploy to GKE
-    - name: Deploy to GKE
+    - name: 'get-credentials'
+      uses: 'google-github-actions/get-gke-credentials@v2'
+      with:
+        cluster_name: 'bdm-project'
+        location: 'asia-south1'
+    
+    - name: 'deploy'
+      shell: bash
       run: |
-        kubectl apply -f k8s/deployment.yaml  # Replace with your Kubernetes deployment file path
-        kubectl apply -f k8s/service.yaml     # Replace with your Kubernetes service file path
-
-    # Step 7: Verify deployment
-    - name: Verify Deployment
-      run: |
-        kubectl rollout status deployment/${{ secrets.K8S_DEPLOYMENT_NAME }}
+        kubectl apply -f k8s/deploy.yaml 
+        kubectl rollout restart deployment dbt-deployement 
+        kubectl get pods
+        kubectl get deployment
