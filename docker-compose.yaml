@@ -3,16 +3,114 @@ version: '3.9'
 services:
   dbt:
     build:
-      context: .  # Use the current directory to build the Docker image
-      dockerfile: Dockerfile
+      context: .
     container_name: dbt_bigquery
-    volumes:
-      - .:/app                  # Mount the entire project directory
-      - ./dbt_packages:/app/dbt_packages  # Mount dbt packages
-      - ./logs:/app/logs        # Mount logs for dbt output
-      - ./.dbt:/root/.dbt       # Mount the `.dbt` folder containing profiles.yml
+    ports:
+      - "8081:8082"
     environment:
-      DBT_PROFILES_DIR: /root/.dbt  # Point dbt to the profiles.yml location
+      DBT_PROFILES_DIR: /app/.dbt
     stdin_open: true
     tty: true
-    command: tail -f /dev/null  # Keeps the container running
+    networks:
+      - airflow_network
+    command: tail -f /dev/null
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5432:5432"
+    networks:
+      - airflow_network
+    restart: "on-failure"
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+    networks:
+      - airflow_network
+
+  airflow-init:
+    image: apache/airflow:2.7.0
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    networks:
+      - airflow_network
+    entrypoint: airflow db migrate
+    restart: "no"
+
+  airflow-webserver:
+    image: apache/airflow:2.7.0
+    container_name: airflow-webserver
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+      AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: 300
+      AIRFLOW__WEBSERVER__WEB_SERVER_WORKER_TIMEOUT: 300
+      _AIRFLOW_WWW_USER_USERNAME: admin         # Set admin username
+      _AIRFLOW_WWW_USER_PASSWORD: admin         # Set admin password
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    networks:
+      - airflow_network
+    command: > 
+       bash -c "airflow db migrate && (airflow users delete --username admin || true) && airflow users create --username "admin" --firstname "Admin" --lastname "User" --role "Admin" --email "admin@example.com" --password "admin" && airflow webserver --workers 2"
+  
+  airflow-scheduler:
+    image: apache/airflow:2.7.0
+    depends_on:
+      - postgres
+      - airflow-webserver
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    networks:
+      - airflow_network
+    command: airflow scheduler
+
+  airflow-worker:
+    image: apache/airflow:2.7.0
+    container_name: bdm-project-airflow-worker-1
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - airflow_network
+    command: airflow celery worker
+networks:
+  airflow_network:
+    driver: bridge

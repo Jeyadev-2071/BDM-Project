@@ -27,7 +27,7 @@ models:
         method: service-account            # Authentication method
         project: iitj-capstone-project-group-18  # GCP project ID
         dataset: BDM_PROJECT               # Default dataset for models
-        keyfile: "iitj-capstone-project-group-18-9b663b95bfee.json"  # Path to service account key
+        keyfile: ".dbt/cred.json"  # Path to service account key
         location: EU                       # Location of the BigQuery instance
         priority: interactive              # Query priority (interactive/batch)
         threads: 2                         # Number of concurrent threads for model execution
