@@ -4,7 +4,6 @@ services:
   dbt:
     build:
       context: .
-      context: .
     container_name: dbt_bigquery
     ports:
       - "8081:8082"

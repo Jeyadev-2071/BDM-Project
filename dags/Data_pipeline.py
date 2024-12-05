@@ -29,7 +29,7 @@ def execute_command_in_existing_container(container_name, command):
         raise e
 
 with DAG(
-    'dbt_workflow_in_existing_container',
+    'bdm_dbt_pipeline',
     default_args=default_args,
     schedule_interval=None,
     catchup=False,
