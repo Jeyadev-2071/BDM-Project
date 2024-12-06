@@ -6,6 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     git \
     libpq-dev \
+    docker.io \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ls -la
