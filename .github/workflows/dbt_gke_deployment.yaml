@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - "!dags/**"
-      - "!.github/workflows/airflow_deployment.yaml"
 
 jobs:
   build-and-deploy:
